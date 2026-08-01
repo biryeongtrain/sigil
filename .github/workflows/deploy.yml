@@ -1,0 +1,23 @@
+name: Publish to Maven
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Deploy
+        run: ./gradlew publish
+        env:
+          BIRYEONG_REPO_USERNAME: ${{ secrets.BIRYEONG_REPO_USERNAME }}
+          BIRYEONG_REPO_PASSWORD: ${{ secrets.BIRYEONG_REPO_PASSWORD }}
