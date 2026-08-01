@@ -1,0 +1,48 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'net.fabricmc.fabric-loom'
+    id 'maven-publish'
+}
+
+sourceSets {
+    testmod {
+        compileClasspath += main.compileClasspath + main.output
+        runtimeClasspath += main.runtimeClasspath + main.output
+    }
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/sigil.classtweaker")
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:$minecraft_version"
+    implementation "net.fabricmc:fabric-loader:$fabric_loader_version"
+    implementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
+}
+
+processResources {
+    filesMatching('fabric.mod.json') {
+        expand project.properties
+    }
+}
+
+processTestmodResources {
+    filesMatching('fabric.mod.json') {
+        expand project.properties
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}

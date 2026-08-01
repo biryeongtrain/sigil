@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "sigil-testmod",
+  "version": "${version}",
+  "authors": [
+    "Zuttomae"
+  ],
+  "license": "Apache-2.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+    ]
+  },
+  "depends": {
+    "sigil": "=${version}"
+  }
+}

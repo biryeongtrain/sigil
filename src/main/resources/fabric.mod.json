@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "sigil",
+  "version": "${version}",
+  "name": "Sigil",
+  "description": "Library for creating server-side skills",
+  "authors": [
+    "Zuttomae"
+  ],
+  "license": "Apache-2.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.zuttomae.sigil.impl.skill.SkillEntrypoint"
+    ]
+  },
+  "mixins": [
+    "sigil.mixins.json"
+  ],
+  "accessWidener": "sigil.classtweaker",
+  "depends": {
+    "minecraft": "~26.2-",
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": ">=${fabric_api_version}"
+  }
+}
