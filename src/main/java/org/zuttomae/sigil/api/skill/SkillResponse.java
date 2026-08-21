@@ -26,6 +26,10 @@ public sealed interface SkillResponse {
         return failure(Component.translatable("skill.failure.cooldown"));
     }
 
+    static Failure noTarget() {
+        return failure(Component.translatable("skill.failure.no_target"));
+    }
+
     static Failure unavailable() {
         return failure(Component.translatable("skill.failure.unavailable"));
     }

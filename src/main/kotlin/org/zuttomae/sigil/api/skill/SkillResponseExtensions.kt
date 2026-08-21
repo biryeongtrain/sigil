@@ -17,5 +17,8 @@ fun notLearned(): SkillResponse.Failure =
 fun cooldown(): SkillResponse.Failure =
     SkillResponse.cooldown()
 
+fun noTarget(): SkillResponse.Failure =
+    SkillResponse.noTarget()
+
 fun unavailable(): SkillResponse.Failure =
     SkillResponse.unavailable()
