@@ -38,7 +38,7 @@ public final class SkillCooldownManagerImpl implements SkillCooldownManager {
     );
 
     private final Map<Holder<? extends Skill<?>>, Integer> cooldowns;
-    private @Nullable LivingEntity source = null;
+    private @Nullable LivingEntity owner = null;
 
     private SkillCooldownManagerImpl(
             Map<? extends Holder<? extends Skill<?>>, ? extends Integer> cooldowns
@@ -88,12 +88,12 @@ public final class SkillCooldownManagerImpl implements SkillCooldownManager {
         }
     }
 
-    public @Nullable LivingEntity getSource() {
-        return source;
+    public @Nullable LivingEntity getOwner() {
+        return owner;
     }
 
-    public void setSource(LivingEntity source) {
-        this.source = Objects.requireNonNull(source);
+    public void setOwner(LivingEntity owner) {
+        this.owner = Objects.requireNonNull(owner);
     }
 
     @SuppressWarnings("unchecked")
@@ -123,11 +123,11 @@ public final class SkillCooldownManagerImpl implements SkillCooldownManager {
     }
 
     private <S> SkillContext<S> createContext(Holder<? extends Skill<S>> skill) {
-        return new SkillContextImpl<>(skill, getSourceOrThrow());
+        return new SkillContextImpl<>(skill, getOwnerOrThrow());
     }
 
-    private LivingEntity getSourceOrThrow() {
-        return Optional.ofNullable(source)
-                .orElseThrow(() -> new IllegalStateException("Source entity is not set"));
+    private LivingEntity getOwnerOrThrow() {
+        return Optional.ofNullable(owner)
+                .orElseThrow(() -> new IllegalStateException("Owner entity is not set"));
     }
 }

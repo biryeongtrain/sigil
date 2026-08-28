@@ -22,7 +22,6 @@ import org.zuttomae.sigil.api.skill.registry.SkillRegistries;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 
 public final class SkillCommand {
     private static final DynamicCommandExceptionType ENTITY_FAILED_EXCEPTION = new DynamicCommandExceptionType(
@@ -46,31 +45,26 @@ public final class SkillCommand {
     private static final SimpleCommandExceptionType TERMINATE_FAILED_EXCEPTION = new SimpleCommandExceptionType(
             Component.translatable("commands.skill.terminate.failed")
     );
-    private static final SimpleCommandExceptionType COOLDOWN_SET_FAILED_EXCEPTION = new SimpleCommandExceptionType(
-            Component.translatable("commands.skill.cooldown.set.failed")
-    );
-    private static final SimpleCommandExceptionType COOLDOWN_CLEAR_FAILED_EXCEPTION = new SimpleCommandExceptionType(
-            Component.translatable("commands.skill.cooldown.clear.failed")
-    );
 
     private SkillCommand() {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(argumentSkill());
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> argumentSkill() {
-        return Commands.literal("skill")
-                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .then(argumentAdd())
-                .then(argumentRemove())
-                .then(argumentTest())
-                .then(argumentCast())
-                .then(argumentCancel())
-                .then(argumentInterrupt())
-                .then(argumentTerminate())
-                .then(argumentCooldown());
+        dispatcher.register(
+                Commands.literal("skill")
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(
+                                Commands.argument("target", EntityArgument.entity())
+                                        .then(argumentAdd())
+                                        .then(argumentRemove())
+                                        .then(argumentTest())
+                                        .then(argumentCast())
+                                        .then(argumentCancel())
+                                        .then(argumentInterrupt())
+                                        .then(argumentTerminate())
+                                        .then(argumentCooldown())
+                        )
+        );
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> argumentAdd() {
@@ -80,40 +74,28 @@ public final class SkillCommand {
                                 .suggests((_, builder) ->
                                         SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                 )
-                                .executes(context ->
-                                        executeAdd(
-                                                context.getSource(),
-                                                List.of(context.getSource().getEntityOrException()),
-                                                List.of(getSkill(IdentifierArgument.getId(context, "skill")))
-                                        )
-                                )
                                 .then(
-                                        Commands.argument("targets", EntityArgument.entities())
+                                        Commands.argument("source", IdentifierArgument.id())
                                                 .executes(context ->
                                                         executeAdd(
                                                                 context.getSource(),
-                                                                EntityArgument.getEntities(context, "targets"),
-                                                                List.of(getSkill(IdentifierArgument.getId(context, "skill")))
+                                                                EntityArgument.getEntity(context, "target"),
+                                                                List.of(getSkill(IdentifierArgument.getId(context, "skill"))),
+                                                                IdentifierArgument.getId(context, "source")
                                                         )
                                                 )
                                 )
                 )
                 .then(
                         Commands.literal("*")
-                                .executes(context ->
-                                        executeAdd(
-                                                context.getSource(),
-                                                List.of(context.getSource().getEntityOrException()),
-                                                SkillRegistries.SKILL.listElements().toList()
-                                        )
-                                )
                                 .then(
-                                        Commands.argument("targets", EntityArgument.entities())
+                                        Commands.argument("source", IdentifierArgument.id())
                                                 .executes(context ->
                                                         executeAdd(
                                                                 context.getSource(),
-                                                                EntityArgument.getEntities(context, "targets"),
-                                                                SkillRegistries.SKILL.listElements().toList()
+                                                                EntityArgument.getEntity(context, "target"),
+                                                                SkillRegistries.SKILL.listElements().toList(),
+                                                                IdentifierArgument.getId(context, "source")
                                                         )
                                                 )
                                 )
@@ -127,40 +109,40 @@ public final class SkillCommand {
                                 .suggests((_, builder) ->
                                         SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                 )
-                                .executes(context ->
-                                        executeRemove(
-                                                context.getSource(),
-                                                List.of(context.getSource().getEntityOrException()),
-                                                List.of(getSkill(IdentifierArgument.getId(context, "skill")))
-                                        )
-                                )
                                 .then(
-                                        Commands.argument("targets", EntityArgument.entities())
+                                        Commands.argument("source", IdentifierArgument.id())
+                                                .suggests((context, builder) ->
+                                                        SharedSuggestionProvider.suggestResource(
+                                                                getSources(EntityArgument.getEntity(context, "target")),
+                                                                builder
+                                                        )
+                                                )
                                                 .executes(context ->
                                                         executeRemove(
                                                                 context.getSource(),
-                                                                EntityArgument.getEntities(context, "targets"),
-                                                                List.of(getSkill(IdentifierArgument.getId(context, "skill")))
+                                                                EntityArgument.getEntity(context, "target"),
+                                                                List.of(getSkill(IdentifierArgument.getId(context, "skill"))),
+                                                                IdentifierArgument.getId(context, "source")
                                                         )
                                                 )
                                 )
                 )
                 .then(
                         Commands.literal("*")
-                                .executes(context ->
-                                        executeRemove(
-                                                context.getSource(),
-                                                List.of(context.getSource().getEntityOrException()),
-                                                SkillRegistries.SKILL.listElements().toList()
-                                        )
-                                )
                                 .then(
-                                        Commands.argument("targets", EntityArgument.entities())
+                                        Commands.argument("source", IdentifierArgument.id())
+                                                .suggests((context, builder) ->
+                                                        SharedSuggestionProvider.suggestResource(
+                                                                getSources(EntityArgument.getEntity(context, "target")),
+                                                                builder
+                                                        )
+                                                )
                                                 .executes(context ->
                                                         executeRemove(
                                                                 context.getSource(),
-                                                                EntityArgument.getEntities(context, "targets"),
-                                                                SkillRegistries.SKILL.listElements().toList()
+                                                                EntityArgument.getEntity(context, "target"),
+                                                                SkillRegistries.SKILL.listElements().toList(),
+                                                                IdentifierArgument.getId(context, "source")
                                                         )
                                                 )
                                 )
@@ -177,19 +159,9 @@ public final class SkillCommand {
                                 .executes(context ->
                                         executeTest(
                                                 context.getSource(),
-                                                context.getSource().getEntityOrException(),
+                                                EntityArgument.getEntity(context, "target"),
                                                 getSkill(IdentifierArgument.getId(context, "skill"))
                                         )
-                                )
-                                .then(
-                                        Commands.argument("target", EntityArgument.entity())
-                                                .executes(context ->
-                                                        executeTest(
-                                                                context.getSource(),
-                                                                EntityArgument.getEntity(context, "target"),
-                                                                getSkill(IdentifierArgument.getId(context, "skill"))
-                                                        )
-                                                )
                                 )
                 );
     }
@@ -204,19 +176,9 @@ public final class SkillCommand {
                                 .executes(context ->
                                         executeCast(
                                                 context.getSource(),
-                                                context.getSource().getEntityOrException(),
+                                                EntityArgument.getEntity(context, "target"),
                                                 getSkill(IdentifierArgument.getId(context, "skill"))
                                         )
-                                )
-                                .then(
-                                        Commands.argument("target", EntityArgument.entity())
-                                                .executes(context ->
-                                                        executeCast(
-                                                                context.getSource(),
-                                                                EntityArgument.getEntity(context, "target"),
-                                                                getSkill(IdentifierArgument.getId(context, "skill"))
-                                                        )
-                                                )
                                 )
                 );
     }
@@ -226,17 +188,8 @@ public final class SkillCommand {
                 .executes(context ->
                         executeCancel(
                                 context.getSource(),
-                                List.of(context.getSource().getEntityOrException())
+                                EntityArgument.getEntity(context, "target")
                         )
-                )
-                .then(
-                        Commands.argument("targets", EntityArgument.entities())
-                                .executes(context ->
-                                        executeCancel(
-                                                context.getSource(),
-                                                EntityArgument.getEntities(context, "targets")
-                                        )
-                                )
                 );
     }
 
@@ -245,17 +198,8 @@ public final class SkillCommand {
                 .executes(context ->
                         executeInterrupt(
                                 context.getSource(),
-                                List.of(context.getSource().getEntityOrException())
+                                EntityArgument.getEntity(context, "target")
                         )
-                )
-                .then(
-                        Commands.argument("targets", EntityArgument.entities())
-                                .executes(context ->
-                                        executeInterrupt(
-                                                context.getSource(),
-                                                EntityArgument.getEntities(context, "targets")
-                                        )
-                                )
                 );
     }
 
@@ -264,43 +208,20 @@ public final class SkillCommand {
                 .executes(context ->
                         executeTerminate(
                                 context.getSource(),
-                                List.of(context.getSource().getEntityOrException())
+                                EntityArgument.getEntity(context, "target")
                         )
-                )
-                .then(
-                        Commands.argument("targets", EntityArgument.entities())
-                                .executes(context ->
-                                        executeTerminate(
-                                                context.getSource(),
-                                                EntityArgument.getEntities(context, "targets")
-                                        )
-                                )
                 );
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> argumentCooldown() {
         return Commands.literal("cooldown")
-                .then(argumentCooldownSet())
-                .then(argumentCooldownGet())
-                .then(argumentCooldownClear());
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> argumentCooldownGet() {
-        return Commands.literal("get")
                 .then(
-                        Commands.argument("skill", IdentifierArgument.id())
-                                .suggests((_, builder) ->
-                                        SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
-                                )
-                                .executes(context ->
-                                        executeCooldownGet(
-                                                context.getSource(),
-                                                context.getSource().getEntityOrException(),
-                                                getSkill(IdentifierArgument.getId(context, "skill"))
-                                        )
-                                )
+                        Commands.literal("get")
                                 .then(
-                                        Commands.argument("target", EntityArgument.entity())
+                                        Commands.argument("skill", IdentifierArgument.id())
+                                                .suggests((_, builder) ->
+                                                        SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
+                                                )
                                                 .executes(context ->
                                                         executeCooldownGet(
                                                                 context.getSource(),
@@ -309,104 +230,70 @@ public final class SkillCommand {
                                                         )
                                                 )
                                 )
-                );
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> argumentCooldownSet() {
-        return Commands.literal("set")
+                )
                 .then(
-                        Commands.argument("skill", IdentifierArgument.id())
-                                .suggests((_, builder) ->
-                                        SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
-                                )
+                        Commands.literal("set")
                                 .then(
-                                        Commands.argument("ticks", IntegerArgumentType.integer(0))
-                                                .executes(context ->
-                                                        executeCooldownSet(
-                                                                context.getSource(),
-                                                                List.of(context.getSource().getEntityOrException()),
-                                                                getSkill(IdentifierArgument.getId(context, "skill")),
-                                                                IntegerArgumentType.getInteger(context, "ticks")
-                                                        )
+                                        Commands.argument("skill", IdentifierArgument.id())
+                                                .suggests((_, builder) ->
+                                                        SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                                 )
                                                 .then(
-                                                        Commands.argument("targets", EntityArgument.entities())
+                                                        Commands.argument("ticks", IntegerArgumentType.integer(0))
                                                                 .executes(context ->
                                                                         executeCooldownSet(
                                                                                 context.getSource(),
-                                                                                EntityArgument.getEntities(context, "targets"),
+                                                                                EntityArgument.getEntity(context, "target"),
                                                                                 getSkill(IdentifierArgument.getId(context, "skill")),
                                                                                 IntegerArgumentType.getInteger(context, "ticks")
                                                                         )
                                                                 )
                                                 )
                                 )
-                );
-    }
-
-    private static LiteralArgumentBuilder<CommandSourceStack> argumentCooldownClear() {
-        return Commands.literal("clear")
-                .executes(context ->
-                        executeCooldownClear(
-                                context.getSource(),
-                                List.of(context.getSource().getEntityOrException())
-                        )
                 )
                 .then(
-                        Commands.argument("targets", EntityArgument.entities())
+                        Commands.literal("clear")
                                 .executes(context ->
                                         executeCooldownClear(
                                                 context.getSource(),
-                                                EntityArgument.getEntities(context, "targets")
+                                                EntityArgument.getEntity(context, "target")
                                         )
                                 )
                 );
     }
 
     private static int executeAdd(
-            CommandSourceStack source,
-            Collection<? extends Entity> targets,
-            Collection<? extends Holder<? extends Skill<?>>> skills
+            CommandSourceStack stack,
+            Entity target,
+            Collection<? extends Holder<? extends Skill<?>>> skills,
+            Identifier source
     ) throws CommandSyntaxException {
-        List<? extends LivingEntity> entities =
-                filterLivingEntities(targets, entity -> entity.getSkillContainer().addSkills(skills) > 0);
-
-        if (entities.isEmpty()) {
+        int added = getLivingEntity(target).getSkillContainer().addPermanentSkills(skills, source);
+        if (added == 0) {
             throw ADD_FAILED_EXCEPTION.create();
         }
 
-        if (entities.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.skill.add.success.single", skills.size(), entities.getFirst().getName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.skill.add.success.multiple", skills.size(), entities.size()), true);
-        }
-
-        return entities.size();
+        stack.sendSuccess(() -> Component.translatable("commands.skill.add.success", added, target.getName()), true);
+        return added;
     }
 
     private static int executeRemove(
-            CommandSourceStack source,
-            Collection<? extends Entity> targets,
-            Collection<? extends Holder<? extends Skill<?>>> skills
+            CommandSourceStack stack,
+            Entity target,
+            Collection<? extends Holder<? extends Skill<?>>> skills,
+            Identifier source
     ) throws CommandSyntaxException {
-        List<? extends LivingEntity> entities =
-                filterLivingEntities(targets, entity -> entity.getSkillContainer().removeSkills(skills) > 0);
-
-        if (entities.isEmpty()) {
+        int removed = getLivingEntity(target).getSkillContainer().removeSkills(skills, source);
+        if (removed == 0) {
             throw REMOVE_FAILED_EXCEPTION.create();
         }
 
-        if (entities.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.skill.remove.success.single", skills.size(), entities.getFirst().getName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.skill.remove.success.multiple", skills.size(), entities.size()), true);
-        }
-
-        return entities.size();
+        stack.sendSuccess(() -> Component.translatable("commands.skill.remove.success", removed, target.getName()), true);
+        return removed;
     }
 
     private static int executeTest(
-            CommandSourceStack source,
+            CommandSourceStack stack,
             Entity target,
             Holder<? extends Skill<?>> skill
     ) throws CommandSyntaxException {
@@ -414,16 +301,16 @@ public final class SkillCommand {
                 getLivingEntity(target).getSkillManager().testSkill(skill)
         ) {
             case SkillResponse.Success ignored ->
-                    source.sendSuccess(() -> Component.translatable("commands.skill.test.success", skill.value().getName(), target.getName()), true);
+                    stack.sendSuccess(() -> Component.translatable("commands.skill.test.success", skill.value().getName(), target.getName()), true);
             case SkillResponse.Failure(Component reason) ->
-                    source.sendSuccess(() -> Component.translatable("commands.skill.test.failure", skill.value().getName(), target.getName(), reason), true);
+                    stack.sendSuccess(() -> Component.translatable("commands.skill.test.failure", skill.value().getName(), target.getName(), reason), true);
         }
 
         return 1;
     }
 
     private static int executeCast(
-            CommandSourceStack source,
+            CommandSourceStack stack,
             Entity target,
             Holder<? extends Skill<?>> skill
     ) throws CommandSyntaxException {
@@ -431,148 +318,90 @@ public final class SkillCommand {
                 getLivingEntity(target).getSkillManager().castSkill(skill)
         ) {
             case SkillResponse.Success ignored ->
-                    source.sendSuccess(() -> Component.translatable("commands.skill.cast.success", skill.value().getName(), target.getName()), true);
+                    stack.sendSuccess(() -> Component.translatable("commands.skill.cast.success", skill.value().getName(), target.getName()), true);
             case SkillResponse.Failure(Component reason) ->
-                    source.sendSuccess(() -> Component.translatable("commands.skill.cast.failure", skill.value().getName(), target.getName(), reason), true);
+                    stack.sendSuccess(() -> Component.translatable("commands.skill.cast.failure", skill.value().getName(), target.getName(), reason), true);
         }
 
         return 1;
     }
 
     private static int executeCancel(
-            CommandSourceStack source,
-            Collection<? extends Entity> targets
+            CommandSourceStack stack,
+            Entity target
     ) throws CommandSyntaxException {
-        List<? extends LivingEntity> entities =
-                filterLivingEntities(targets, entity -> entity.getSkillManager().cancelCasting());
-
-        if (entities.isEmpty()) {
+        if (!getLivingEntity(target).getSkillManager().cancelCasting()) {
             throw CANCEL_FAILED_EXCEPTION.create();
         }
 
-        if (entities.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.skill.cancel.success.single", entities.getFirst().getName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.skill.cancel.success.multiple", entities.size()), true);
-        }
-
-        return entities.size();
+        stack.sendSuccess(() -> Component.translatable("commands.skill.cancel.success", target.getName()), true);
+        return 1;
     }
 
     private static int executeInterrupt(
-            CommandSourceStack source,
-            Collection<? extends Entity> targets
+            CommandSourceStack stack,
+            Entity target
     ) throws CommandSyntaxException {
-        List<? extends LivingEntity> entities =
-                filterLivingEntities(targets, entity -> entity.getSkillManager().interruptCasting());
-
-        if (entities.isEmpty()) {
+        if (!getLivingEntity(target).getSkillManager().interruptCasting()) {
             throw INTERRUPT_FAILED_EXCEPTION.create();
         }
 
-        if (entities.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.skill.interrupt.success.single", entities.getFirst().getName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.skill.interrupt.success.multiple", entities.size()), true);
-        }
-
-        return entities.size();
+        stack.sendSuccess(() -> Component.translatable("commands.skill.interrupt.success", target.getName()), true);
+        return 1;
     }
 
     private static int executeTerminate(
-            CommandSourceStack source,
-            Collection<? extends Entity> targets
+            CommandSourceStack stack,
+            Entity target
     ) throws CommandSyntaxException {
-        List<? extends LivingEntity> entities =
-                filterLivingEntities(targets, entity -> entity.getSkillManager().terminateCasting());
-
-        if (entities.isEmpty()) {
+        if (!getLivingEntity(target).getSkillManager().terminateCasting()) {
             throw TERMINATE_FAILED_EXCEPTION.create();
         }
 
-        if (entities.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.skill.terminate.success.single", entities.getFirst().getName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.skill.terminate.success.multiple", entities.size()), true);
-        }
-
-        return entities.size();
+        stack.sendSuccess(() -> Component.translatable("commands.skill.terminate.success", target.getName()), true);
+        return 1;
     }
 
     private static int executeCooldownGet(
-            CommandSourceStack source,
+            CommandSourceStack stack,
             Entity target,
             Holder<? extends Skill<?>> skill
     ) throws CommandSyntaxException {
-        LivingEntity livingEntity = getLivingEntity(target);
-        int cooldown = livingEntity.getSkillCooldownManager().getCooldown(skill);
+        int cooldown = getLivingEntity(target).getSkillCooldownManager().getCooldown(skill);
 
         if (cooldown > 0) {
-            source.sendSuccess(() -> Component.translatable("commands.skill.cooldown.get.success", skill.value().getName(), target.getName(), cooldown), true);
+            stack.sendSuccess(() -> Component.translatable("commands.skill.cooldown.get.success", skill.value().getName(), target.getName(), cooldown), true);
         } else {
-            source.sendSuccess(() -> Component.translatable("commands.skill.cooldown.get.none", skill.value().getName(), target.getName()), true);
+            stack.sendSuccess(() -> Component.translatable("commands.skill.cooldown.get.none", skill.value().getName(), target.getName()), true);
         }
 
         return cooldown;
     }
 
     private static int executeCooldownSet(
-            CommandSourceStack source,
-            Collection<? extends Entity> targets,
+            CommandSourceStack stack,
+            Entity target,
             Holder<? extends Skill<?>> skill,
             int ticks
     ) throws CommandSyntaxException {
-        List<? extends LivingEntity> entities =
-                filterLivingEntities(targets, entity -> {
-                    entity.getSkillCooldownManager().setCooldown(skill, ticks);
-                    return true;
-                });
+        getLivingEntity(target).getSkillCooldownManager().setCooldown(skill, ticks);
 
-        if (entities.isEmpty()) {
-            throw COOLDOWN_SET_FAILED_EXCEPTION.create();
-        }
-
-        if (entities.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.skill.cooldown.set.success.single", skill.value().getName(), ticks, entities.getFirst().getName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.skill.cooldown.set.success.multiple", skill.value().getName(), ticks, entities.size()), true);
-        }
-
-        return entities.size();
+        stack.sendSuccess(() -> Component.translatable("commands.skill.cooldown.set.success", skill.value().getName(), ticks, target.getName()), true);
+        return 1;
     }
 
     private static int executeCooldownClear(
-            CommandSourceStack source,
-            Collection<? extends Entity> targets
+            CommandSourceStack stack,
+            Entity target
     ) throws CommandSyntaxException {
-        List<? extends LivingEntity> entities =
-                filterLivingEntities(targets, entity -> {
-                    entity.getSkillCooldownManager().clearCooldowns();
-                    return true;
-                });
+        getLivingEntity(target).getSkillCooldownManager().clearCooldowns();
 
-        if (entities.isEmpty()) {
-            throw COOLDOWN_CLEAR_FAILED_EXCEPTION.create();
-        }
-
-        if (entities.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.skill.cooldown.clear.success.single", entities.getFirst().getName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.skill.cooldown.clear.success.multiple", entities.size()), true);
-        }
-
-        return entities.size();
+        stack.sendSuccess(() -> Component.translatable("commands.skill.cooldown.clear.success", target.getName()), true);
+        return 1;
     }
 
-    private static List<? extends LivingEntity> filterLivingEntities(
-            Collection<? extends Entity> entities,
-            Predicate<? super LivingEntity> predicate
-    ) {
-        return entities.stream()
-                .filter(LivingEntity.class::isInstance)
-                .map(LivingEntity.class::cast)
-                .filter(predicate)
-                .toList();
+    private static Collection<Identifier> getSources(Entity target) throws CommandSyntaxException {
+        return getLivingEntity(target).getSkillContainer().getSources();
     }
 
     private static LivingEntity getLivingEntity(Entity entity) throws CommandSyntaxException {

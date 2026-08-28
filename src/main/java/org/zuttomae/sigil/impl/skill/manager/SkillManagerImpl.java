@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public final class SkillManagerImpl implements SkillManager {
     private @Nullable SkillInstance<?> instance = null;
-    private @Nullable LivingEntity source = null;
+    private @Nullable LivingEntity owner = null;
 
     @Override
     public boolean isCasting() {
@@ -73,12 +73,12 @@ public final class SkillManagerImpl implements SkillManager {
         return true;
     }
 
-    public @Nullable LivingEntity getSource() {
-        return source;
+    public @Nullable LivingEntity getOwner() {
+        return owner;
     }
 
-    public void setSource(LivingEntity source) {
-        this.source = Objects.requireNonNull(source);
+    public void setOwner(LivingEntity owner) {
+        this.owner = Objects.requireNonNull(owner);
     }
 
     public void update() {
@@ -171,7 +171,7 @@ public final class SkillManagerImpl implements SkillManager {
     private <S> SkillContext<S> createContext(Holder<? extends Skill<S>> skill) {
         return new SkillContextImpl<>(
                 skill,
-                getSourceOrThrow()
+                getOwnerOrThrow()
         );
     }
 
@@ -185,8 +185,8 @@ public final class SkillManagerImpl implements SkillManager {
         );
     }
 
-    private LivingEntity getSourceOrThrow() {
-        return Optional.ofNullable(source)
-                .orElseThrow(() -> new IllegalStateException("Source entity is not set"));
+    private LivingEntity getOwnerOrThrow() {
+        return Optional.ofNullable(owner)
+                .orElseThrow(() -> new IllegalStateException("Owner entity is not set"));
     }
 }

@@ -31,8 +31,8 @@ public abstract class LivingEntityMixin extends Entity implements SkillEntity {
         SkillContainerImpl skillContainer =
                 (SkillContainerImpl) getAttachedOrCreate(SkillAttachments.SKILL_CONTAINER, SkillContainerImpl::new);
 
-        if (skillContainer.getSource() != (Object) this) {
-            skillContainer.setSource(sigil$livingEntity());
+        if (skillContainer.getOwner() != (Object) this) {
+            skillContainer.setOwner(sigil$livingEntity());
         }
 
         return skillContainer;
@@ -44,8 +44,8 @@ public abstract class LivingEntityMixin extends Entity implements SkillEntity {
         SkillCooldownManagerImpl skillCooldownManager =
                 (SkillCooldownManagerImpl) getAttachedOrCreate(SkillAttachments.SKILL_COOLDOWN_MANAGER, SkillCooldownManagerImpl::new);
 
-        if (skillCooldownManager.getSource() != (Object) this) {
-            skillCooldownManager.setSource(sigil$livingEntity());
+        if (skillCooldownManager.getOwner() != (Object) this) {
+            skillCooldownManager.setOwner(sigil$livingEntity());
         }
 
         return skillCooldownManager;
@@ -57,8 +57,8 @@ public abstract class LivingEntityMixin extends Entity implements SkillEntity {
         SkillManagerImpl skillManager =
                 (SkillManagerImpl) getAttachedOrCreate(SkillAttachments.SKILL_MANAGER, SkillManagerImpl::new);
 
-        if (skillManager.getSource() != (Object) this) {
-            skillManager.setSource(sigil$livingEntity());
+        if (skillManager.getOwner() != (Object) this) {
+            skillManager.setOwner(sigil$livingEntity());
         }
 
         return skillManager;
