@@ -10,7 +10,7 @@ import org.zuttomae.sigil.impl.skill.command.SkillCommand;
 public final class SkillEntrypoint implements ModInitializer {
     @Override
     public void onInitialize() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, _, _) ->
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 SkillCommand.register(dispatcher)
         );
         SkillAttachments.initialize();

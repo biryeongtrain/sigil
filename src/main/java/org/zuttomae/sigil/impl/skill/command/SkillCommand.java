@@ -10,10 +10,10 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.IdentifierArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.zuttomae.sigil.api.skill.Skill;
@@ -52,7 +52,7 @@ public final class SkillCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("skill")
-                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(
                                 Commands.argument("target", EntityArgument.entity())
                                         .then(argumentAdd())
@@ -70,18 +70,18 @@ public final class SkillCommand {
     private static LiteralArgumentBuilder<CommandSourceStack> argumentAdd() {
         return Commands.literal("add")
                 .then(
-                        Commands.argument("skill", IdentifierArgument.id())
-                                .suggests((_, builder) ->
+                        Commands.argument("skill", ResourceLocationArgument.id())
+                                .suggests((ignored, builder) ->
                                         SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                 )
                                 .then(
-                                        Commands.argument("source", IdentifierArgument.id())
+                                        Commands.argument("source", ResourceLocationArgument.id())
                                                 .executes(context ->
                                                         executeAdd(
                                                                 context.getSource(),
                                                                 EntityArgument.getEntity(context, "target"),
-                                                                List.of(getSkill(IdentifierArgument.getId(context, "skill"))),
-                                                                IdentifierArgument.getId(context, "source")
+                                                                List.of(getSkill(ResourceLocationArgument.getId(context, "skill"))),
+                                                                ResourceLocationArgument.getId(context, "source")
                                                         )
                                                 )
                                 )
@@ -89,13 +89,13 @@ public final class SkillCommand {
                 .then(
                         Commands.literal("*")
                                 .then(
-                                        Commands.argument("source", IdentifierArgument.id())
+                                        Commands.argument("source", ResourceLocationArgument.id())
                                                 .executes(context ->
                                                         executeAdd(
                                                                 context.getSource(),
                                                                 EntityArgument.getEntity(context, "target"),
                                                                 SkillRegistries.SKILL.listElements().toList(),
-                                                                IdentifierArgument.getId(context, "source")
+                                                                ResourceLocationArgument.getId(context, "source")
                                                         )
                                                 )
                                 )
@@ -105,12 +105,12 @@ public final class SkillCommand {
     private static LiteralArgumentBuilder<CommandSourceStack> argumentRemove() {
         return Commands.literal("remove")
                 .then(
-                        Commands.argument("skill", IdentifierArgument.id())
-                                .suggests((_, builder) ->
+                        Commands.argument("skill", ResourceLocationArgument.id())
+                                .suggests((ignored, builder) ->
                                         SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                 )
                                 .then(
-                                        Commands.argument("source", IdentifierArgument.id())
+                                        Commands.argument("source", ResourceLocationArgument.id())
                                                 .suggests((context, builder) ->
                                                         SharedSuggestionProvider.suggestResource(
                                                                 getSources(EntityArgument.getEntity(context, "target")),
@@ -121,8 +121,8 @@ public final class SkillCommand {
                                                         executeRemove(
                                                                 context.getSource(),
                                                                 EntityArgument.getEntity(context, "target"),
-                                                                List.of(getSkill(IdentifierArgument.getId(context, "skill"))),
-                                                                IdentifierArgument.getId(context, "source")
+                                                                List.of(getSkill(ResourceLocationArgument.getId(context, "skill"))),
+                                                                ResourceLocationArgument.getId(context, "source")
                                                         )
                                                 )
                                 )
@@ -130,7 +130,7 @@ public final class SkillCommand {
                 .then(
                         Commands.literal("*")
                                 .then(
-                                        Commands.argument("source", IdentifierArgument.id())
+                                        Commands.argument("source", ResourceLocationArgument.id())
                                                 .suggests((context, builder) ->
                                                         SharedSuggestionProvider.suggestResource(
                                                                 getSources(EntityArgument.getEntity(context, "target")),
@@ -142,7 +142,7 @@ public final class SkillCommand {
                                                                 context.getSource(),
                                                                 EntityArgument.getEntity(context, "target"),
                                                                 SkillRegistries.SKILL.listElements().toList(),
-                                                                IdentifierArgument.getId(context, "source")
+                                                                ResourceLocationArgument.getId(context, "source")
                                                         )
                                                 )
                                 )
@@ -152,15 +152,15 @@ public final class SkillCommand {
     private static LiteralArgumentBuilder<CommandSourceStack> argumentTest() {
         return Commands.literal("test")
                 .then(
-                        Commands.argument("skill", IdentifierArgument.id())
-                                .suggests((_, builder) ->
+                        Commands.argument("skill", ResourceLocationArgument.id())
+                                .suggests((ignored, builder) ->
                                         SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                 )
                                 .executes(context ->
                                         executeTest(
                                                 context.getSource(),
                                                 EntityArgument.getEntity(context, "target"),
-                                                getSkill(IdentifierArgument.getId(context, "skill"))
+                                                getSkill(ResourceLocationArgument.getId(context, "skill"))
                                         )
                                 )
                 );
@@ -169,15 +169,15 @@ public final class SkillCommand {
     private static LiteralArgumentBuilder<CommandSourceStack> argumentCast() {
         return Commands.literal("cast")
                 .then(
-                        Commands.argument("skill", IdentifierArgument.id())
-                                .suggests((_, builder) ->
+                        Commands.argument("skill", ResourceLocationArgument.id())
+                                .suggests((ignored, builder) ->
                                         SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                 )
                                 .executes(context ->
                                         executeCast(
                                                 context.getSource(),
                                                 EntityArgument.getEntity(context, "target"),
-                                                getSkill(IdentifierArgument.getId(context, "skill"))
+                                                getSkill(ResourceLocationArgument.getId(context, "skill"))
                                         )
                                 )
                 );
@@ -218,15 +218,15 @@ public final class SkillCommand {
                 .then(
                         Commands.literal("get")
                                 .then(
-                                        Commands.argument("skill", IdentifierArgument.id())
-                                                .suggests((_, builder) ->
+                                        Commands.argument("skill", ResourceLocationArgument.id())
+                                                .suggests((ignored, builder) ->
                                                         SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                                 )
                                                 .executes(context ->
                                                         executeCooldownGet(
                                                                 context.getSource(),
                                                                 EntityArgument.getEntity(context, "target"),
-                                                                getSkill(IdentifierArgument.getId(context, "skill"))
+                                                                getSkill(ResourceLocationArgument.getId(context, "skill"))
                                                         )
                                                 )
                                 )
@@ -234,8 +234,8 @@ public final class SkillCommand {
                 .then(
                         Commands.literal("set")
                                 .then(
-                                        Commands.argument("skill", IdentifierArgument.id())
-                                                .suggests((_, builder) ->
+                                        Commands.argument("skill", ResourceLocationArgument.id())
+                                                .suggests((ignored, builder) ->
                                                         SharedSuggestionProvider.suggestResource(SkillRegistries.SKILL.keySet(), builder)
                                                 )
                                                 .then(
@@ -244,7 +244,7 @@ public final class SkillCommand {
                                                                         executeCooldownSet(
                                                                                 context.getSource(),
                                                                                 EntityArgument.getEntity(context, "target"),
-                                                                                getSkill(IdentifierArgument.getId(context, "skill")),
+                                                                                getSkill(ResourceLocationArgument.getId(context, "skill")),
                                                                                 IntegerArgumentType.getInteger(context, "ticks")
                                                                         )
                                                                 )
@@ -266,7 +266,7 @@ public final class SkillCommand {
             CommandSourceStack stack,
             Entity target,
             Collection<? extends Holder<? extends Skill<?>>> skills,
-            Identifier source
+            ResourceLocation source
     ) throws CommandSyntaxException {
         int added = getLivingEntity(target).getSkillContainer().addPermanentSkills(skills, source);
         if (added == 0) {
@@ -281,7 +281,7 @@ public final class SkillCommand {
             CommandSourceStack stack,
             Entity target,
             Collection<? extends Holder<? extends Skill<?>>> skills,
-            Identifier source
+            ResourceLocation source
     ) throws CommandSyntaxException {
         int removed = getLivingEntity(target).getSkillContainer().removeSkills(skills, source);
         if (removed == 0) {
@@ -400,7 +400,7 @@ public final class SkillCommand {
         return 1;
     }
 
-    private static Collection<Identifier> getSources(Entity target) throws CommandSyntaxException {
+    private static Collection<ResourceLocation> getSources(Entity target) throws CommandSyntaxException {
         return getLivingEntity(target).getSkillContainer().getSources();
     }
 
@@ -412,7 +412,7 @@ public final class SkillCommand {
         return livingEntity;
     }
 
-    private static Holder<? extends Skill<?>> getSkill(Identifier id) throws CommandSyntaxException {
+    private static Holder<? extends Skill<?>> getSkill(ResourceLocation id) throws CommandSyntaxException {
         return SkillRegistries.SKILL.get(id)
                 .orElseThrow(() -> NOT_FOUND_EXCEPTION.create(id));
     }

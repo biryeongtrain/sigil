@@ -1,8 +1,8 @@
 package org.zuttomae.sigil.api.skill;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
 import org.jetbrains.annotations.Nullable;
 import org.zuttomae.sigil.api.entity.attribute.AttributeModifierSet;
 import org.zuttomae.sigil.api.skill.behavior.*;
@@ -29,7 +29,7 @@ public final class Skill<S> {
     private final SkillInterruptPredicate<S> interruptPredicate;
     private final SkillStateFactory<S> stateFactory;
 
-    private @Nullable Identifier id;
+    private @Nullable ResourceLocation id;
     private @Nullable String translationKey;
     private @Nullable Component name;
 
@@ -112,7 +112,7 @@ public final class Skill<S> {
         return stateFactory;
     }
 
-    public Identifier getId() {
+    public ResourceLocation getId() {
         if (id == null) {
             id = SkillRegistries.SKILL.getKey(this);
         }

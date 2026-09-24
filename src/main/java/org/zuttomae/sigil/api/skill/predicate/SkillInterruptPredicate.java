@@ -8,11 +8,11 @@ import java.util.Objects;
 @FunctionalInterface
 public interface SkillInterruptPredicate<S> {
     static <S> SkillInterruptPredicate<S> allowed() {
-        return _ -> true;
+        return ignored -> true;
     }
 
     static <S> SkillInterruptPredicate<S> denied() {
-        return _ -> false;
+        return ignored -> false;
     }
 
     boolean test(SkillInstance<? extends S> instance);

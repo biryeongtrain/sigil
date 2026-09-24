@@ -17,9 +17,16 @@
   "mixins": [
     "sigil.mixins.json"
   ],
-  "accessWidener": "sigil.classtweaker",
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_1309": [
+        "org/zuttomae/sigil/api/skill/entity/SkillEntity"
+      ]
+    }
+  },
   "depends": {
-    "minecraft": "~26.2-",
+    "minecraft": "${minecraft_version}",
+    "java": ">=21",
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": ">=${fabric_api_version}"
   }

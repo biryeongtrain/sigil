@@ -5,7 +5,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 import org.zuttomae.sigil.api.skill.Skill;
@@ -22,7 +22,7 @@ import java.util.*;
 public final class SkillContainerImpl implements SkillContainer {
     @SuppressWarnings("unchecked")
     public static final Codec<SkillContainer> CODEC = Codec.unboundedMap(
-                    Identifier.CODEC,
+                    ResourceLocation.CODEC,
                     SkillRegistries.SKILL.holderByNameCodec()
                             .listOf()
                             .<Set<Holder<Skill<?>>>>xmap(LinkedHashSet::new, List::copyOf)
@@ -31,17 +31,17 @@ public final class SkillContainerImpl implements SkillContainer {
             .codec()
             .xmap(
                     SkillContainerImpl::new,
-                    container -> (Map<Identifier, Set<Holder<Skill<?>>>>) (Map<?, ?>) Multimaps.asMap(
+                    container -> (Map<ResourceLocation, Set<Holder<Skill<?>>>>) (Map<?, ?>) Multimaps.asMap(
                             ((SkillContainerImpl) container).permanentSkillsBySource
                     )
             );
 
-    private final SetMultimap<Identifier, Holder<? extends Skill<?>>> skillsBySource = LinkedHashMultimap.create();
-    private final SetMultimap<Identifier, Holder<? extends Skill<?>>> permanentSkillsBySource = LinkedHashMultimap.create();
+    private final SetMultimap<ResourceLocation, Holder<? extends Skill<?>>> skillsBySource = LinkedHashMultimap.create();
+    private final SetMultimap<ResourceLocation, Holder<? extends Skill<?>>> permanentSkillsBySource = LinkedHashMultimap.create();
     private @Nullable LivingEntity owner = null;
 
     private SkillContainerImpl(
-            Map<Identifier, ? extends Collection<? extends Holder<? extends Skill<?>>>> skills
+            Map<ResourceLocation, ? extends Collection<? extends Holder<? extends Skill<?>>>> skills
     ) {
         Objects.requireNonNull(skills);
 
@@ -59,7 +59,7 @@ public final class SkillContainerImpl implements SkillContainer {
     }
 
     @Override
-    public Set<? extends Holder<? extends Skill<?>>> getSkills(Identifier source) {
+    public Set<? extends Holder<? extends Skill<?>>> getSkills(ResourceLocation source) {
         Objects.requireNonNull(source);
 
         return Set.copyOf(skillsBySource.get(source));
@@ -71,7 +71,7 @@ public final class SkillContainerImpl implements SkillContainer {
     }
 
     @Override
-    public Set<Identifier> getSources() {
+    public Set<ResourceLocation> getSources() {
         return Set.copyOf(skillsBySource.keySet());
     }
 
@@ -83,7 +83,7 @@ public final class SkillContainerImpl implements SkillContainer {
     }
 
     @Override
-    public boolean hasSkill(Holder<? extends Skill<?>> skill, Identifier source) {
+    public boolean hasSkill(Holder<? extends Skill<?>> skill, ResourceLocation source) {
         Objects.requireNonNull(skill);
         Objects.requireNonNull(source);
 
@@ -92,7 +92,7 @@ public final class SkillContainerImpl implements SkillContainer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean addTransientSkill(Holder<? extends Skill<?>> skill, Identifier source) {
+    public boolean addTransientSkill(Holder<? extends Skill<?>> skill, ResourceLocation source) {
         Objects.requireNonNull(skill);
         Objects.requireNonNull(source);
 
@@ -109,7 +109,7 @@ public final class SkillContainerImpl implements SkillContainer {
     }
 
     @Override
-    public int addTransientSkills(Collection<? extends Holder<? extends Skill<?>>> skills, Identifier source) {
+    public int addTransientSkills(Collection<? extends Holder<? extends Skill<?>>> skills, ResourceLocation source) {
         Objects.requireNonNull(skills);
 
         int count = 0;
@@ -123,7 +123,7 @@ public final class SkillContainerImpl implements SkillContainer {
     }
 
     @Override
-    public boolean addPermanentSkill(Holder<? extends Skill<?>> skill, Identifier source) {
+    public boolean addPermanentSkill(Holder<? extends Skill<?>> skill, ResourceLocation source) {
         if (!addTransientSkill(skill, source)) {
             return false;
         }
@@ -133,7 +133,7 @@ public final class SkillContainerImpl implements SkillContainer {
     }
 
     @Override
-    public int addPermanentSkills(Collection<? extends Holder<? extends Skill<?>>> skills, Identifier source) {
+    public int addPermanentSkills(Collection<? extends Holder<? extends Skill<?>>> skills, ResourceLocation source) {
         Objects.requireNonNull(skills);
 
         int count = 0;
@@ -148,7 +148,7 @@ public final class SkillContainerImpl implements SkillContainer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean removeSkill(Holder<? extends Skill<?>> skill, Identifier source) {
+    public boolean removeSkill(Holder<? extends Skill<?>> skill, ResourceLocation source) {
         Objects.requireNonNull(skill);
         Objects.requireNonNull(source);
 
@@ -169,7 +169,7 @@ public final class SkillContainerImpl implements SkillContainer {
         Objects.requireNonNull(skill);
 
         boolean removed = false;
-        for (Identifier source : List.copyOf(skillsBySource.keySet())) {
+        for (ResourceLocation source : List.copyOf(skillsBySource.keySet())) {
             removed |= removeSkill(skill, source);
         }
 
@@ -177,7 +177,7 @@ public final class SkillContainerImpl implements SkillContainer {
     }
 
     @Override
-    public int removeSkills(Collection<? extends Holder<? extends Skill<?>>> skills, Identifier source) {
+    public int removeSkills(Collection<? extends Holder<? extends Skill<?>>> skills, ResourceLocation source) {
         Objects.requireNonNull(skills);
         Objects.requireNonNull(source);
 
@@ -207,7 +207,7 @@ public final class SkillContainerImpl implements SkillContainer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public int removeSkills(Identifier source) {
+    public int removeSkills(ResourceLocation source) {
         Objects.requireNonNull(source);
 
         Set<Holder<? extends Skill<?>>> removed = skillsBySource.removeAll(source);

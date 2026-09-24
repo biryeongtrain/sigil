@@ -1,7 +1,7 @@
 package org.zuttomae.sigil.api.entity.attribute;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -96,12 +96,12 @@ public final class AttributeModifierSet {
         ) {
             Objects.requireNonNull(attribute);
             Objects.requireNonNull(operation);
-            return addModifier(attribute, Identifier.fromNamespaceAndPath("sigil", UUID.randomUUID().toString()), value, operation);
+            return addModifier(attribute, ResourceLocation.fromNamespaceAndPath("sigil", UUID.randomUUID().toString()), value, operation);
         }
 
         public Builder addModifier(
                 Holder<Attribute> attribute,
-                Identifier id,
+                ResourceLocation id,
                 double value,
                 AttributeModifier.Operation operation
         ) {

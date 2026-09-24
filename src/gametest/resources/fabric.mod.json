@@ -8,8 +8,8 @@
   "license": "Apache-2.0",
   "environment": "*",
   "entrypoints": {
-    "main": [
-    ]
+    "main": ["org.zuttomae.sigil.SigilGameTest"],
+    "fabric-gametest": ["org.zuttomae.sigil.SigilGameTest"]
   },
   "depends": {
     "sigil": "=${version}"

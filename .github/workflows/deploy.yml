@@ -1,6 +1,7 @@
 name: Publish to Maven
 
 on:
+  workflow_dispatch:
   release:
     types: [ published ]
 
@@ -13,11 +14,11 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '21'
           distribution: 'temurin'
 
+      - name: Verify
+        run: ./gradlew build runGameTest --no-daemon
+
       - name: Deploy
-        run: ./gradlew publish
-        env:
-          BIRYEONG_REPO_USERNAME: ${{ secrets.BIRYEONG_REPO_USERNAME }}
-          BIRYEONG_REPO_PASSWORD: ${{ secrets.BIRYEONG_REPO_PASSWORD }}
+        run: ./gradlew publish --no-daemon
