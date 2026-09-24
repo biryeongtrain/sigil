@@ -53,5 +53,8 @@ Run with JDK 21:
 The GameTests exercise per-entity cast state and duration, server-tick completion,
 cooldown expiry, cancellation, temporary attribute cleanup, entity attachment
 serialization, entity removal, and server-player death. They do not test client visuals.
-Publishing uses the same `qf-repo` Maven repository configuration as
+Publishing uses the same `qf-repo` Maven repository URL as
 [minigame-shader](https://github.com/biryeongtrain/minigame-shader/blob/master/build.gradle).
+The repository requires authentication: set `BIRYEONG_REPO_USERNAME` and
+`BIRYEONG_REPO_PASSWORD` in the publishing process environment, or configure the
+GitHub Actions secrets with those names for the publish workflow.

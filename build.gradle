@@ -61,6 +61,11 @@ publishing {
         maven {
             name = "qf-repo"
             url = uri("https://repo.biryeong.kim/releases/")
+
+            credentials {
+                username = System.getenv("BIRYEONG_REPO_USERNAME")
+                password = System.getenv("BIRYEONG_REPO_PASSWORD")
+            }
         }
     }
 }

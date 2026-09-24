@@ -22,3 +22,6 @@ jobs:
 
       - name: Deploy
         run: ./gradlew publish --no-daemon
+        env:
+          BIRYEONG_REPO_USERNAME: ${{ secrets.BIRYEONG_REPO_USERNAME }}
+          BIRYEONG_REPO_PASSWORD: ${{ secrets.BIRYEONG_REPO_PASSWORD }}
