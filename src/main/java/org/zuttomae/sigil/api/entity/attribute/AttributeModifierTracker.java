@@ -1,7 +1,7 @@
 package org.zuttomae.sigil.api.entity.attribute;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -30,12 +30,12 @@ public final class AttributeModifierTracker {
         Objects.requireNonNull(attribute);
         Objects.requireNonNull(operation);
 
-        applyModifier(attribute, Identifier.fromNamespaceAndPath("sigil", UUID.randomUUID().toString()), value, operation);
+        applyModifier(attribute, ResourceLocation.fromNamespaceAndPath("sigil", UUID.randomUUID().toString()), value, operation);
     }
 
     public void applyModifier(
             Holder<Attribute> attribute,
-            Identifier id,
+            ResourceLocation id,
             double value,
             AttributeModifier.Operation operation
     ) {
@@ -74,7 +74,7 @@ public final class AttributeModifierTracker {
 
     public void removeModifier(
             Holder<Attribute> attribute,
-            Identifier id
+            ResourceLocation id
     ) {
         Objects.requireNonNull(attribute);
         Objects.requireNonNull(id);
@@ -100,7 +100,7 @@ public final class AttributeModifierTracker {
 
     private record Record(
             Holder<Attribute> attribute,
-            Identifier id
+            ResourceLocation id
     ) {
         private Record {
             Objects.requireNonNull(attribute);

@@ -8,7 +8,7 @@ import java.util.Objects;
 @FunctionalInterface
 public interface SkillStartBehavior<S> {
     static <S> SkillStartBehavior<S> noOp() {
-        return _ -> {};
+        return ignored -> {};
     }
 
     void execute(SkillInstance<? extends S> instance);

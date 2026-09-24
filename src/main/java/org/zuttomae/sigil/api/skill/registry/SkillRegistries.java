@@ -6,7 +6,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.zuttomae.sigil.api.skill.Skill;
 
 public interface SkillRegistries {
-    Registry<Skill<?>> SKILL = FabricRegistryBuilder.create(SkillRegistryKeys.SKILL).buildAndRegister();
+    Registry<Skill<?>> SKILL = FabricRegistryBuilder.createSimple(SkillRegistryKeys.SKILL).buildAndRegister();
 
     @ApiStatus.Internal
     static void initialize() {

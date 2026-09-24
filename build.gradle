@@ -1,24 +1,29 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
-    id 'net.fabricmc.fabric-loom'
+    id 'fabric-loom'
     id 'maven-publish'
+    id 'net.linguica.maven-settings' version '0.5'
 }
 
-sourceSets {
-    testmod {
-        compileClasspath += main.compileClasspath + main.output
-        runtimeClasspath += main.runtimeClasspath + main.output
-    }
-}
-
-loom {
-    accessWidenerPath = file("src/main/resources/sigil.classtweaker")
+repositories {
+    mavenCentral()
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:$minecraft_version"
-    implementation "net.fabricmc:fabric-loader:$fabric_loader_version"
-    implementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
+}
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = 'sigil-testmod'
+        enableGameTests = true
+        enableClientGameTests = false
+        eula = true
+    }
 }
 
 processResources {
@@ -27,7 +32,7 @@ processResources {
     }
 }
 
-processTestmodResources {
+processGametestResources {
     filesMatching('fabric.mod.json') {
         expand project.properties
     }
@@ -38,8 +43,12 @@ java {
     withJavadocJar()
 
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+jar {
+    from('LICENSE')
 }
 
 publishing {
@@ -51,13 +60,8 @@ publishing {
 
     repositories {
         maven {
-            name = "biryeong"
+            name = "qf-repo"
             url = uri("https://repo.biryeong.kim/releases/")
-
-            credentials {
-                username = System.getenv("BIRYEONG_REPO_USERNAME")
-                password = System.getenv("BIRYEONG_REPO_PASSWORD")
-            }
         }
     }
 }

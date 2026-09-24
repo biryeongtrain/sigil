@@ -1,6 +1,7 @@
 name: Publish to Maven
 
 on:
+  workflow_dispatch:
   release:
     types: [ published ]
 
@@ -13,11 +14,17 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '21'
           distribution: 'temurin'
+          server-id: qf-repo
+          server-username: BIRYEONG_REPO_USERNAME
+          server-password: BIRYEONG_REPO_PASSWORD
+
+      - name: Verify
+        run: ./gradlew build runGameTest --no-daemon
 
       - name: Deploy
-        run: ./gradlew publish
+        run: ./gradlew publish --no-daemon
         env:
           BIRYEONG_REPO_USERNAME: ${{ secrets.BIRYEONG_REPO_USERNAME }}
           BIRYEONG_REPO_PASSWORD: ${{ secrets.BIRYEONG_REPO_PASSWORD }}
