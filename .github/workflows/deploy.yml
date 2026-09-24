@@ -16,6 +16,9 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          server-id: qf-repo
+          server-username: BIRYEONG_REPO_USERNAME
+          server-password: BIRYEONG_REPO_PASSWORD
 
       - name: Verify
         run: ./gradlew build runGameTest --no-daemon

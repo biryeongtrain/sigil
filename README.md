@@ -55,6 +55,7 @@ cooldown expiry, cancellation, temporary attribute cleanup, entity attachment
 serialization, entity removal, and server-player death. They do not test client visuals.
 Publishing uses the same `qf-repo` Maven repository URL as
 [minigame-shader](https://github.com/biryeongtrain/minigame-shader/blob/master/build.gradle).
-The repository requires authentication: set `BIRYEONG_REPO_USERNAME` and
-`BIRYEONG_REPO_PASSWORD` in the publishing process environment, or configure the
-GitHub Actions secrets with those names for the publish workflow.
+The `net.linguica.maven-settings` plugin reads the `qf-repo` server entry from
+`~/.m2/settings.xml`, including encrypted credentials using `~/.m2/settings-security.xml`.
+For GitHub Actions, configure `BIRYEONG_REPO_USERNAME` and `BIRYEONG_REPO_PASSWORD`
+secrets; the Java setup step writes the corresponding Maven settings entry.

@@ -2,6 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'fabric-loom'
     id 'maven-publish'
+    id 'net.linguica.maven-settings' version '0.5'
 }
 
 repositories {
@@ -61,11 +62,6 @@ publishing {
         maven {
             name = "qf-repo"
             url = uri("https://repo.biryeong.kim/releases/")
-
-            credentials {
-                username = System.getenv("BIRYEONG_REPO_USERNAME")
-                password = System.getenv("BIRYEONG_REPO_PASSWORD")
-            }
         }
     }
 }
